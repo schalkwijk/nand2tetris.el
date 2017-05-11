@@ -35,6 +35,7 @@
 
 ;;; Code:
 (require 'nand2tetris-core)
+(require 'nand2tetris-autotest)
 (require 'eldoc)
 (require 'yasnippet)
 (require 'rx)

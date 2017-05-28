@@ -31,15 +31,19 @@
 
 (setq nand2tetris-jack-font-lock-keywords
   `(;;Keywords
-    (,(rx symbol-start (group (or "class" "method" "field" "constructor" "function")) symbol-end)
-     (1 font-lock-type-face))
+    (,(rx symbol-start (group (or "class" "method" "field" "constructor" "function")) symbol-end
+          (1+ space) (group (1+ word)) (group (zero-or-more (1+ space) (or (1+ word)))))
+     (1 font-lock-constant-face)
+     (2 font-lock-type-face)
+     (3 font-lock-variable-name-face))
 
-    (,(rx symbol-start (group (or "while" "do" "var" "let" "return")))
+    (,(rx symbol-start (group (or "if" "while" "do" "var" "let" "return")))
      (1 font-lock-constant-face))
 
     (,(rx (or "var" "let") (1+ space) (group (1+ (or word))))
      (1 font-lock-variable-name-face))
 
+    ;; function declarations
     (,(rx space (group (1+ (or word ?_)))
           "(" (* (or word space)) ")")
      (1 font-lock-function-name-face))))

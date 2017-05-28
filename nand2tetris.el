@@ -301,5 +301,10 @@ Interactively, prompt for symbol."
              (cons (concat (expand-file-name nand2tetris-core-base-dir) "\.*\\.hdl")
                    'nand2tetris-mode))
 
+;;;###autoload
+(add-to-list 'auto-mode-alist
+             (cons (concat (expand-file-name nand2tetris-core-base-dir) "\.*\\.jack")
+                   'nand2tetris-jack-mode))
+
 (provide 'nand2tetris)
 ;;; nand2tetris.el ends here

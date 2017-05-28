@@ -20,3 +20,5 @@ CLOSED: [2015-08-15 Sat 13:10]
 * TODO Color highlighting for .hack files? (cute experiment)
 * TODO Test Mode?
 * TODO Also Open a diff between .cmp and .out when error is given.
+* TODO Test mode gets stuck in infinite loop when running ASM tests (dur)
+* TODO Test mode should get cleaned up considerably

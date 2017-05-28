@@ -29,14 +29,14 @@
   (recenter (- -1 (min (max 0 scroll-margin)
                        (truncate (/ (window-body-height) 4.0))))))
 
-(defvar nand2tetris/buffer "*nand2tetris-autotest*")
+(defvar nand2tetris/buffer "*nand2tetris-auto*")
 
 (defun nand2tetris/compile-asm (current)
-  (shell-command (concat nand2tetris-assembler " " (buffer-file-name current))))
+  (shell-command (concat nand2tetris-assembler " " (buffer-file-name current)) (current-buffer)))
 
 (defmacro with-nand2tetris-buffer (&rest body)
   `(let ((current (current-buffer))
-         (window (get-buffer-window "*nand2tetris-autotest*")))
+         (window (get-buffer-window nand2tetris/buffer)))
      (if window
          (select-window window)
        (let ((window (split-window-vertically -4)))
@@ -45,6 +45,12 @@
          (set-window-dedicated-p window t)))
      ,@body
      (switch-to-buffer-other-window current)))
+
+(defun nand2tetris/compile-asm-with-buffer ()
+  (let ((current (current-buffer)))
+    (with-nand2tetris-buffer
+     (nand2tetris/clear-buffer)
+     (nand2tetris/compile-asm current))))
 
 (defun nand2tetris/run-asm-tests ()
   (let ((current (current-buffer)))
@@ -82,10 +88,20 @@
         (nand2tetris/run-hdl-tests)
       (nand2tetris/run-asm-tests))))
 
+(defun nand2tetris/compile-hook ()
+  (when (and (derived-mode-p 'nand2tetris-assembler-mode)
+             (s-ends-with? ".asm" (buffer-file-name)))
+    (nand2tetris/compile-asm-with-buffer)))
+
 (defun nand2tetris-autotest-init ()
   (interactive)
   (message "nand2tetris autotest initialized")
   (add-hook 'after-save-hook 'nand2tetris/run-tests-hook))
+
+(defun nand2tetris-autocompile-init ()
+  (interactive)
+  (message "nand2tetris autocompile initialized")
+  (add-hook 'after-save-hook 'nand2tetris/compile-hook))
 
 (defun nand2tetris-autotest-stop-it ()
   (interactive)

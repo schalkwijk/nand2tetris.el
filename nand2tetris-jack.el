@@ -30,6 +30,15 @@
 ;;; Code:
 (require 'cc-mode)
 
+;; flycheck
+(flycheck-define-checker nand2tetris-jack
+  "A syntax-checker for the nand2tetris jack language"
+  :command ("JackCompiler.sh" source)
+  :error-patterns
+  ((error line-start "In " (file-name) " (line " line "): " (message) line-end))
+  :modes nand2tetris-jack-mode)
+
+;; font-lock
 (setq nand2tetris-jack-font-lock-keywords
   `(;;Keywords
     (,(rx symbol-start (group (or "class" "method" "field" "constructor" "function")) symbol-end
@@ -52,18 +61,21 @@
           "(" (* (or word space)) ")")
      (1 font-lock-function-name-face))))
 
-(defvar c-mode-syntax-table
-  (funcall (c-lang-const c-make-mode-syntax-table c))
-  "Syntax table used in c-mode buffers.")
 
+;; major-mode here
 (define-derived-mode nand2tetris-jack-mode prog-mode
   "nand2tetris-jack"
   "Major mode for editing Jack files for the Nand2Tetris course"
 
-  ;; borrow heavily from c mode
-  ;; more specifically, we want indentation
+  ;; gimme all your indentation, c-mode
   (c-init-language-vars-for 'c-mode)
   (c-common-init 'c-mode)
+
+  ;; flycheck configuration
+  (add-to-list 'flycheck-checkers 'nand2tetris-jack)
+  (add-to-list 'flycheck-global-modes 'nand2tetris-jack-mode)
+  ;; ugly hack to get flycheck to find the compiler executable
+  (add-to-list 'exec-path nand2tetris-tools-dir)
 
   (set (make-local-variable 'comment-start) "// ")
   (set (make-local-variable 'comment-start-skip) "//+\\s-*")

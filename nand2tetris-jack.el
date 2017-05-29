@@ -56,14 +56,14 @@
     (,(rx symbol-start (group (or "if" "while" "do" "var" "let" "return") symbol-end))
      (1 font-lock-constant-face))
 
-    (,(rx symbol-start (group (or "this") symbol-end))
+    (,(rx symbol-start (group (or "this" "true" "false") symbol-end))
      (1 font-lock-warning-face))
 
     (,(rx (or "var" "let") (1+ space) (group (1+ (or word))))
      (1 font-lock-variable-name-face))
 
     ;; function declarations
-    (,(rx space (group (1+ (or word ?_)))
+    (,(rx (not (any "do")) space (group (1+ (or word ?_)))
           "(" (* (or word space)) ")")
      (1 font-lock-function-name-face))))
 

@@ -28,6 +28,7 @@
 ;; See: https://www.coursera.org/course/nand2tetris1
 
 ;;; Code:
+(require 'cc-mode)
 
 (setq nand2tetris-jack-font-lock-keywords
   `(;;Keywords
@@ -37,8 +38,11 @@
      (2 font-lock-type-face)
      (3 font-lock-variable-name-face))
 
-    (,(rx symbol-start (group (or "if" "while" "do" "var" "let" "return")))
+    (,(rx symbol-start (group (or "if" "while" "do" "var" "let" "return") symbol-end))
      (1 font-lock-constant-face))
+
+    (,(rx symbol-start (group (or "this") symbol-end))
+     (1 font-lock-warning-face))
 
     (,(rx (or "var" "let") (1+ space) (group (1+ (or word))))
      (1 font-lock-variable-name-face))
@@ -48,9 +52,18 @@
           "(" (* (or word space)) ")")
      (1 font-lock-function-name-face))))
 
+(defvar c-mode-syntax-table
+  (funcall (c-lang-const c-make-mode-syntax-table c))
+  "Syntax table used in c-mode buffers.")
+
 (define-derived-mode nand2tetris-jack-mode prog-mode
   "nand2tetris-jack"
   "Major mode for editing Jack files for the Nand2Tetris course"
+
+  ;; borrow heavily from c mode
+  ;; more specifically, we want indentation
+  (c-init-language-vars-for 'c-mode)
+  (c-common-init 'c-mode)
 
   (set (make-local-variable 'comment-start) "// ")
   (set (make-local-variable 'comment-start-skip) "//+\\s-*")

@@ -31,12 +31,35 @@
 (require 'cc-mode)
 
 ;; flycheck
+;; we use the compiler as a makeshift syntax
+;; checker, with the unfortunate side-effect
+;; that you'll end up with the compiled .vm
+;; files in your source directory  ¯\_(ツ)_/¯
+
+;; note that we have two checkers - one that
+;; evaluates the buffer immediately, regardless
+;; if the buffer is saved or not, and another
+;; that runs on the entire directory. Doing so
+;; catches errors in the case where function
+;; signatures don't match between caller and
+;; callee, among other errors
+
+(flycheck-define-checker nand2tetris-jack-directory
+  "A syntax-checker for the nand2tetris jack language"
+  :command ("JackCompiler.sh" (eval (file-name-directory (buffer-file-name))))
+  :modes nand2tetris-jack-mode
+  :error-patterns
+  ((error line-start "In " (file-name) " (line " line "): " (message) line-end))
+  :predicate (lambda () (flycheck-buffer-saved-p)))
+
 (flycheck-define-checker nand2tetris-jack
   "A syntax-checker for the nand2tetris jack language"
   :command ("JackCompiler.sh" source)
   :error-patterns
   ((error line-start "In " (file-name) " (line " line "): " (message) line-end))
-  :modes nand2tetris-jack-mode)
+  :modes nand2tetris-jack-mode
+  :next-checkers ((t . nand2tetris-jack-directory))
+  )
 
 ;; font-lock
 (setq nand2tetris-jack-font-lock-keywords
@@ -47,7 +70,7 @@
      (2 font-lock-type-face)
      (3 font-lock-variable-name-face))
 
-    (,(rx symbol-start (group (or "//") (1+ (or space word)) line-end))
+    (,(rx symbol-start (group (or "//") (* anything) line-end))
      (1 font-lock-comment-face))
 
     (,(rx symbol-start (group (or "/*") (1+ anything) "*/" line-end))
@@ -67,7 +90,6 @@
           "(" (* (or word space)) ")")
      (1 font-lock-function-name-face))))
 
-
 ;; major-mode here
 (define-derived-mode nand2tetris-jack-mode prog-mode
   "nand2tetris-jack"
@@ -79,6 +101,7 @@
 
   ;; flycheck configuration
   (add-to-list 'flycheck-checkers 'nand2tetris-jack)
+  (add-to-list 'flycheck-checkers 'nand2tetris-jack-directory)
   (add-to-list 'flycheck-global-modes 'nand2tetris-jack-mode)
   ;; ugly hack to get flycheck to find the compiler executable
   (add-to-list 'exec-path nand2tetris-tools-dir)

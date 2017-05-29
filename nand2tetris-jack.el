@@ -47,6 +47,12 @@
      (2 font-lock-type-face)
      (3 font-lock-variable-name-face))
 
+    (,(rx symbol-start (group (or "//") (1+ (or space word)) line-end))
+     (1 font-lock-comment-face))
+
+    (,(rx symbol-start (group (or "/*") (1+ anything) "*/" line-end))
+     (1 font-lock-comment-face))
+
     (,(rx symbol-start (group (or "if" "while" "do" "var" "let" "return") symbol-end))
      (1 font-lock-constant-face))
 

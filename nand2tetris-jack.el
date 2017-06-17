@@ -64,13 +64,24 @@
 ;; font-lock
 (setq nand2tetris-jack-font-lock-keywords
   `(;;Keywords
-    (,(rx symbol-start (group (or "class" "method" "field" "constructor" "function")) symbol-end
-          (1+ space) (group (1+ word)) (group (zero-or-more (1+ space) (or (1+ word)))))
+    (,(rx symbol-start (group "class") symbol-end
+          (1+ space) (group (1+ word)) (*? space) "{")
+     (1 font-lock-constant-face)
+     (2 font-lock-type-face))
+
+    (,(rx symbol-start (group (or "function" "method" "constructor")) symbol-end
+          (1+ space) (group (+ word)) (1+ space) (group (+? word)) "(")
      (1 font-lock-constant-face)
      (2 font-lock-type-face)
      (3 font-lock-variable-name-face))
 
-    (,(rx symbol-start (group (or "if" "while" "do" "var" "let" "return") symbol-end))
+    (,(rx symbol-start (group (or "field" "static" "var")) symbol-end
+          (1+ space) (group (+ word)) (1+ space) (group (+? (or space word ","))) ";")
+     (1 font-lock-constant-face)
+     (2 font-lock-type-face)
+     (3 font-lock-variable-name-face))
+
+    (,(rx symbol-start (group (or "if" "while" "do" "let" "return") symbol-end))
      (1 font-lock-constant-face))
 
     (,(rx symbol-start (group (or "this" "true" "false") symbol-end))

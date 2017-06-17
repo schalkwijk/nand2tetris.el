@@ -70,12 +70,6 @@
      (2 font-lock-type-face)
      (3 font-lock-variable-name-face))
 
-    (,(rx symbol-start (group (or "//") (* anything) line-end))
-     (1 font-lock-comment-face))
-
-    (,(rx symbol-start (group (or "/*") (1+ anything) "*/" line-end))
-     (1 font-lock-comment-face))
-
     (,(rx symbol-start (group (or "if" "while" "do" "var" "let" "return") symbol-end))
      (1 font-lock-constant-face))
 
@@ -89,6 +83,16 @@
     (,(rx (not (any "do")) space (group (1+ (or word ?_)))
           "(" (* (or word space)) ")")
      (1 font-lock-function-name-face))))
+
+;; syntax flags copied from
+;; http://ergoemacs.org/emacs_manual/elisp/Syntax-Flags.html
+;; which describes comment highlighting for c++
+(setq nand2tetris-jack-mode-syntax-table
+      (let ((table (make-syntax-table)))
+        (modify-syntax-entry ?\/ ". 124" table)
+        (modify-syntax-entry ?* ". 23b" table)
+        (modify-syntax-entry ?\n ">" table)
+        table))
 
 ;; major-mode here
 (define-derived-mode nand2tetris-jack-mode prog-mode
@@ -106,9 +110,11 @@
   ;; ugly hack to get flycheck to find the compiler executable
   (add-to-list 'exec-path nand2tetris-tools-dir)
 
-  (set (make-local-variable 'comment-start) "// ")
+  (set (make-local-variable 'comment-start) "/* ")
   (set (make-local-variable 'comment-start-skip) "//+\\s-*")
   (set (make-local-variable 'font-lock-defaults)
-       `(,nand2tetris-jack-font-lock-keywords nil nil nil nil)))
+       `(,nand2tetris-jack-font-lock-keywords nil nil nil nil))
+  (set (make-local-variable 'font-lock-syntax-table)
+       nand2tetris-jack-mode-syntax-table))
 
 (provide 'nand2tetris-jack)

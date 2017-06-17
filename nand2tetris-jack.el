@@ -73,13 +73,16 @@
           (1+ space) (group (+ word)) (1+ space) (group (+? word)) "(")
      (1 font-lock-constant-face)
      (2 font-lock-type-face)
-     (3 font-lock-variable-name-face))
+     (3 font-lock-variable-name-face)
+     (,(rx symbol-start (group (+ word)) symbol-end (+ space) (group (+ word)) (*? space) (or "," ")"))
+      nil nil
+      (1 font-lock-type-face)
+      (2 font-lock-variable-name-face)))
 
-    (,(rx symbol-start (group (or "field" "static" "var")) symbol-end
-          (1+ space) (group (+ word)) (1+ space) (group (+? (or space word ","))) ";")
+    (,(rx symbol-start (group (or "field" "static" "var")) symbol-end (1+ space) (group (+ word)) (+ space))
      (1 font-lock-constant-face)
      (2 font-lock-type-face)
-     (3 font-lock-variable-name-face))
+     (,(rx (group (+ word))) nil nil (1 font-lock-variable-name-face)))
 
     (,(rx symbol-start (group (or "if" "while" "do" "let" "return") symbol-end))
      (1 font-lock-constant-face))
